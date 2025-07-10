@@ -24,10 +24,12 @@ const Login = () => {
         toast.success('¡Bienvenido de vuelta!');
 
         if (loggedUser.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+  navigate('/admin');
+} else if (loggedUser.role === 'delivery') {
+  navigate('/delivery');
+} else {
+  navigate('/');
+}
       } else {
         toast.error('Credenciales incorrectas');
       }
