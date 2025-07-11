@@ -27,7 +27,7 @@ const Profile = () => {
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    address: user?.address || ''
+    address: (user?.addresses?.find(a => a.isDefault)?.street) || ''
   });
 
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
@@ -95,8 +95,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
-      address: user?.address || ''
-      
+      address: (user?.addresses?.find(a => a.isDefault)?.street) || ''
     });
   }, [user]);
 
@@ -237,21 +236,10 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-4">
-            <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gray-300 cursor-pointer group">
-  <img
-    src={user?.photoURL || '/images/default-avatar.png'}
-    alt={user?.name}
-    className="w-full h-full object-cover group-hover:brightness-75 transition"
-    onClick={() => document.getElementById('profile-image-input')?.click()}
-  />
-  <input
-    type="file"
-    id="profile-image-input"
-    accept="image/*"
-    onChange={handleImageUpload}
-    className="hidden"
-  />
+           <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+  <span className="text-white font-bold text-xl">FD</span>
 </div>
+
 
 
             <div>

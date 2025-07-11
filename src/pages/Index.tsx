@@ -93,12 +93,13 @@ const featuredCategories = [
               </Link>
               {!isAuthenticated && (
                 <Link to="/register">
-                  <Button
-                    variant="outline"
-                    className="text-lg px-8 py-3 bg-white/10 border-white/30 text-white hover:bg-white/20 transition-all duration-300 hover:scale-105"
-                  >
-                    Registrarse Gratis
-                  </Button>
+                 <Button
+  variant="outline"
+  className="text-lg px-8 py-3 bg-white/10 border-white/30 text-white transition-all duration-300 hover:bg-white hover:text-black hover:scale-105"
+>
+  Registrarse Gratis
+</Button>
+
                 </Link>
               )}
             </div>

@@ -11,8 +11,10 @@ const statusStepMap = {
   pending: 1,
   preparing: 2,
   'on-way': 3,
-  delivered: 4,
+  'picked-up': 4,
+  delivered: 5,
 };
+
 
 const OrderTracking = () => {
   const { id } = useParams();
@@ -30,36 +32,44 @@ const OrderTracking = () => {
 
   if (!order) return <p className="text-center mt-10">Cargando pedido...</p>;
 
-  const steps = [
-    {
-      id: 1,
-      title: 'Pedido Confirmado',
-      description: 'Tu pedido ha sido recibido',
-      icon: CheckCircle,
-      time: '14:30',
-    },
-    {
-      id: 2,
-      title: 'Preparando',
-      description: 'El restaurante está preparando tu comida',
-      icon: Clock,
-      time: '14:35',
-    },
-    {
-      id: 3,
-      title: 'En camino',
-      description: 'Tu pedido está siendo entregado',
-      icon: Truck,
-      time: currentStep >= 3 ? order.estimatedTime : null,
-    },
-    {
-      id: 4,
-      title: 'Entregado',
-      description: 'Tu pedido ha sido entregado',
-      icon: Package,
-      time: currentStep >= 4 ? order.deliveredTime : null,
-    },
-  ];
+ const steps = [
+  {
+    id: 1,
+    title: 'Pedido Confirmado',
+    description: 'Tu pedido ha sido recibido',
+    icon: CheckCircle,
+    time: '14:30',
+  },
+  {
+    id: 2,
+    title: 'Preparando',
+    description: 'El restaurante está preparando tu comida',
+    icon: Clock,
+    time: '14:35',
+  },
+  {
+    id: 3,
+    title: 'En camino',
+    description: 'El repartidor va hacia el restaurante',
+    icon: Truck,
+    time: currentStep >= 3 ? order.estimatedTime : null,
+  },
+  {
+    id: 4,
+    title: 'Recogido por el repartidor',
+    description: 'El repartidor ya tiene tu pedido y va hacia tu dirección',
+    icon: Package,
+    time: currentStep >= 4 ? order.estimatedTime : null,
+  },
+  {
+    id: 5,
+    title: 'Entregado',
+    description: 'Tu pedido ha sido entregado',
+    icon: Package,
+    time: currentStep >= 5 ? order.deliveredTime : null,
+  },
+];
+
 
   const deliveryPerson = {
     name: 'Carlos Rodríguez',

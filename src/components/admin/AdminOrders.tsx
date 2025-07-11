@@ -26,7 +26,8 @@ import { Clock, MapPin, User } from 'lucide-react';
 const statusLabels = {
   pending: 'Pendiente',
   preparing: 'Preparando',
-  'on-way': 'En Camino',
+  'on-way': 'Por recoger',
+  'picked-up' :'Recogido',
   delivered: 'Entregado',
   cancelled: 'Cancelado',
 } as const;
@@ -35,6 +36,7 @@ const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
   preparing: 'bg-blue-100 text-blue-800',
   'on-way': 'bg-orange-100 text-orange-800',
+  'picked-up': 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
 } as const;
@@ -155,21 +157,24 @@ export const AdminOrders = () => {
             </TableHeader>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">#{order.id}</TableCell>
+                <TableRow key={order.id ?? Math.random()}>
+                  <TableCell className="font-medium">#{order.id ?? 'N/A'}</TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order.userId}</p>
-                      {/* Podés mostrar otros datos como teléfono si tenés */}
+                      <p className="font-medium">{order.userId ?? 'Desconocido'}</p>
                       <p className="text-xs text-gray-400">
-                        {order.date instanceof Date 
-                          ? order.date.toLocaleString() 
-                          : order.date?.toDate?.().toLocaleString() || ''}
+                        {order.date instanceof Date
+                          ? order.date.toLocaleString()
+                          : order.date?.toDate?.()
+                          ? order.date.toDate().toLocaleString()
+                          : typeof order.date === 'string'
+                          ? new Date(order.date).toLocaleString()
+                          : ''}
                       </p>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-48">
-                    <p className="text-sm truncate">{order.deliveryAddress || '-'}</p>
+                    <p className="text-sm truncate">{order.deliveryAddress ?? '-'}</p>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
@@ -180,14 +185,13 @@ export const AdminOrders = () => {
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">${order.total.toFixed(2)}</TableCell>
+                  <TableCell className="font-medium">${order.total?.toFixed(2) ?? '0.00'}</TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
                   <TableCell>
-                   <Select 
-  value={order.status} 
-  onValueChange={(value) => handleStatusChange(order.id!, value as OrderData['status'])}
->
-
+                    <Select 
+                      value={order.status} 
+                      onValueChange={(value) => handleStatusChange(order.id!, value as OrderData['status'])}
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>

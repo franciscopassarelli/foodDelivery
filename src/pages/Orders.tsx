@@ -11,7 +11,7 @@ import { listenToUserOrders } from '@/lib/firebase/orders';
 interface Order {
   id: string;
   date: string;
-  status: 'pending' | 'preparing' | 'on-way' | 'delivered' | 'cancelled';
+  status: 'pending' | 'preparing' | 'on-way' | 'picked-up' | 'delivered' | 'cancelled';
   total: number;
   items: Array<{
     name: string;
@@ -52,39 +52,43 @@ const Orders = () => {
     return () => unsubscribe();
   }, [user]);
 
-  const getStatusColor = (status: Order['status']) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'preparing':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'on-way':
-        return 'bg-blue-100 text-blue-800';
-      case 'delivered':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+ const getStatusColor = (status: Order['status']) => {
+  switch (status) {
+    case 'pending':
+    case 'preparing':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'on-way':
+      return 'bg-blue-100 text-blue-800';
+    case 'picked-up':
+      return 'bg-purple-100 text-purple-800';
+    case 'delivered':
+      return 'bg-green-100 text-green-800';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 
-  const getStatusText = (status: Order['status']) => {
-    switch (status) {
-      case 'pending':
-        return 'Pedido Confirmado';
-      case 'preparing':
-        return 'Preparando';
-      case 'on-way':
-        return 'En caminooo';
-      case 'delivered':
-        return 'Entregado';
-      case 'cancelled':
-        return 'Cancelado';
-      default:
-        return 'Desconocido';
-    }
-  };
+const getStatusText = (status: Order['status']) => {
+  switch (status) {
+    case 'pending':
+      return 'Pedido Confirmado';
+    case 'preparing':
+      return 'Preparando';
+    case 'on-way':
+      return 'En camino';
+    case 'picked-up':
+      return 'Recogido por el repartidor';
+    case 'delivered':
+      return 'Entregado';
+    case 'cancelled':
+      return 'Cancelado';
+    default:
+      return 'Desconocido';
+  }
+};
+
 
   const filteredOrders = orders.filter((order) => {
     if (filter === 'active') return ['pending', 'preparing', 'on-way'].includes(order.status);

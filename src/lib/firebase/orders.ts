@@ -17,7 +17,7 @@ export interface OrderData {
   id?: string;
   userId: string;
   date: Date | any;
-  status: 'pending' | 'preparing' | 'on-way' | 'delivered' | 'cancelled';
+  status: 'pending' | 'preparing' | 'on-way' |  'picked-up' | 'delivered' | 'cancelled';
   total: number;
   items: Array<{
     name: string;
@@ -84,6 +84,7 @@ export const listenOrders = (callback: (orders: OrderData[]) => void) => {
 export const saveOrder = async (order: OrderData) => {
   await addDoc(collection(db, 'orders'), {
     ...order,
+    deliveryAddress: order.deliveryAddress || '', // ✅ Asegurarse de guardarla para delivery
     status: order.status || 'pending',
     deliveryId: 'unassigned', // <--- ESTA LÍNEA ES CLAVE
     date: Timestamp.fromDate(order.date instanceof Date ? order.date : new Date()),

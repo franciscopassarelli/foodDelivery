@@ -14,6 +14,7 @@ export interface DeliveryOrder {
   id: string;
   customer: string;
   customerPhone: string;
+  deliveryAddress: string; // ✅ Agregado
   address: string;
   items: Array<{ name: string; quantity: number }>;
   total: number;

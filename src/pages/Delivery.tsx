@@ -173,21 +173,36 @@ const Delivery = () => {
                         <div><h4 className="font-semibold">Pedido #{order.id.slice(-3)}</h4><p className="text-sm text-gray-600">{order.customer}</p></div>
                         <div className="text-right"><p className="font-bold text-green-600">${order.total}</p><p className="text-sm text-gray-500">{order.distance}</p></div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
-                        <MapPin size={14} /><span>{order.address}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock size={14} /><span>{order.estimatedTime}</span>
-                      </div>
-                      <div className="text-sm mt-2 text-gray-700">
-                        {order.items.map((item, i) => (
-                          <span key={i}>{item.quantity}x {item.name}{i < order.items.length - 1 ? ', ' : ''}</span>
-                        ))}
-                      </div>
-                      <div className="flex gap-2 mt-4">
-                        <Button className="flex-1" onClick={() => handleAcceptOrder(order)}>Aceptar</Button>
-                        <Button variant="outline"><Navigation size={16} />Ruta</Button>
-                      </div>
+                     <div className="flex items-center gap-2 text-sm text-gray-700 mt-2 font-medium">
+  <MapPin size={16} className="text-blue-500" />
+  <span>{order.deliveryAddress}</span>
+</div>
+
+<div className="flex items-center gap-2 text-sm text-gray-600">
+  <Clock size={14} /><span>{order.estimatedTime}</span>
+</div>
+
+<div className="text-sm mt-2 text-gray-700">
+  {order.items.map((item, i) => (
+    <span key={i}>{item.quantity}x {item.name}{i < order.items.length - 1 ? ', ' : ''}</span>
+  ))}
+</div>
+
+<div className="flex gap-2 mt-4">
+  <Button className="flex-1" onClick={() => handleAcceptOrder(order)}>Aceptar</Button>
+
+  <a
+    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryAddress)}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex-1"
+  >
+    <Button variant="outline" className="w-full flex gap-2 items-center justify-center">
+      <Navigation size={16} /> Ruta
+    </Button>
+  </a>
+</div>
+
                     </div>
                   ))}
                 </div>
@@ -212,22 +227,36 @@ const Delivery = () => {
                           <span className="font-bold text-green-600">${order.total}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
-                        <MapPin size={14} /><span>{order.address}</span>
-                      </div>
-                      <div className="flex gap-2 mt-4">
-                        <Button variant="outline" size="sm"><Phone size={14} />Llamar</Button>
-                        {order.status === 'on-way' && (
-                          <Button onClick={() => handleUpdateStatus(order.id, 'picked-up')} size="sm">
-                            Marcar Recogido
-                          </Button>
-                        )}
-                        {order.status === 'picked-up' && (
-                          <Button onClick={() => handleUpdateStatus(order.id, 'delivered')} size="sm">
-                            <CheckCircle size={14} />Entregado
-                          </Button>
-                        )}
-                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-700 mt-2 font-medium">
+  <MapPin size={16} className="text-blue-500" />
+  <span>{order.deliveryAddress}</span>
+</div>
+
+<div className="flex gap-2 mt-4 flex-wrap">
+  <Button variant="outline" size="sm"><Phone size={14} /> Llamar</Button>
+
+  <a
+    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryAddress)}`}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Button variant="outline" size="sm" className="flex gap-1 items-center">
+      <Navigation size={14} /> Ruta
+    </Button>
+  </a>
+
+  {order.status === 'on-way' && (
+    <Button onClick={() => handleUpdateStatus(order.id, 'picked-up')} size="sm">
+      Marcar Recogido
+    </Button>
+  )}
+  {order.status === 'picked-up' && (
+    <Button onClick={() => handleUpdateStatus(order.id, 'delivered')} size="sm">
+      <CheckCircle size={14} /> Entregado
+    </Button>
+  )}
+</div>
+
                     </div>
                   ))}
                 </div>
