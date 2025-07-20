@@ -138,78 +138,134 @@ export const AdminOrders = () => {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Pedidos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Pedido #</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Dirección</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id ?? Math.random()}>
-                  <TableCell className="font-medium">#{order.id ?? 'N/A'}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{order.userId ?? 'Desconocido'}</p>
-                      <p className="text-xs text-gray-400">
-                        {order.date instanceof Date
-                          ? order.date.toLocaleString()
-                          : order.date?.toDate?.()
-                          ? order.date.toDate().toLocaleString()
-                          : typeof order.date === 'string'
-                          ? new Date(order.date).toLocaleString()
-                          : ''}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="max-w-48">
-                    <p className="text-sm truncate">{order.deliveryAddress ?? '-'}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      {order.items.map((item, index) => (
-                        <p key={index} className="text-sm">
-                          {item.name} x{item.quantity}
-                        </p>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">${order.total?.toFixed(2) ?? '0.00'}</TableCell>
-                  <TableCell>{getStatusBadge(order.status)}</TableCell>
-                  <TableCell>
-                    <Select 
-                      value={order.status} 
-                      onValueChange={(value) => handleStatusChange(order.id!, value as OrderData['status'])}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pendiente</SelectItem>
-                        <SelectItem value="preparing">Preparando</SelectItem>
-                        <SelectItem value="on-way">En Camino</SelectItem>
-                        <SelectItem value="delivered">Entregado</SelectItem>
-                        <SelectItem value="cancelled">Cancelado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                </TableRow>
+   <Card>
+  <CardHeader>
+    <CardTitle>Lista de Pedidos</CardTitle>
+  </CardHeader>
+  <CardContent className="overflow-x-auto">
+    {/* Desktop Table */}
+    <div className="hidden sm:block">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Pedido #</TableHead>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Dirección</TableHead>
+            <TableHead>Items</TableHead>
+            <TableHead>Total</TableHead>
+            <TableHead>Estado</TableHead>
+            <TableHead>Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => (
+            <TableRow key={order.id ?? Math.random()}>
+              <TableCell className="font-medium">#{order.id ?? 'N/A'}</TableCell>
+              <TableCell>
+                <div>
+                  <p className="font-medium">{order.userId ?? 'Desconocido'}</p>
+                  <p className="text-xs text-gray-400">
+                    {order.date instanceof Date
+                      ? order.date.toLocaleString()
+                      : order.date?.toDate?.()
+                      ? order.date.toDate().toLocaleString()
+                      : typeof order.date === 'string'
+                      ? new Date(order.date).toLocaleString()
+                      : ''}
+                  </p>
+                </div>
+              </TableCell>
+              <TableCell className="max-w-48">
+                <p className="text-sm truncate">{order.deliveryAddress ?? '-'}</p>
+              </TableCell>
+              <TableCell>
+                <div className="space-y-1">
+                  {order.items.map((item, index) => (
+                    <p key={index} className="text-sm">
+                      {item.name} x{item.quantity}
+                    </p>
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell className="font-medium">
+                ${order.total?.toFixed(2) ?? '0.00'}
+              </TableCell>
+              <TableCell>{getStatusBadge(order.status)}</TableCell>
+              <TableCell>
+                <Select
+                  value={order.status}
+                  onValueChange={(value) =>
+                    handleStatusChange(order.id!, value as OrderData['status'])
+                  }
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pendiente</SelectItem>
+                    <SelectItem value="preparing">Preparando</SelectItem>
+                    <SelectItem value="on-way">En Camino</SelectItem>
+                    <SelectItem value="delivered">Entregado</SelectItem>
+                    <SelectItem value="cancelled">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+
+    {/* Mobile View */}
+    <div className="space-y-4 sm:hidden">
+      {orders.map((order) => (
+        <div key={order.id ?? Math.random()} className="border p-4 rounded-lg shadow-sm bg-white">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-gray-700">Pedido #{order.id ?? 'N/A'}</span>
+            {getStatusBadge(order.status)}
+          </div>
+          <p className="text-sm text-gray-500 mb-1">
+            <span className="font-medium">Cliente:</span> {order.userId ?? 'Desconocido'}
+          </p>
+          <p className="text-sm text-gray-500 mb-1">
+            <span className="font-medium">Dirección:</span> {order.deliveryAddress ?? '-'}
+          </p>
+          <p className="text-sm text-gray-500 mb-1">
+            <span className="font-medium">Total:</span> ${order.total?.toFixed(2) ?? '0.00'}
+          </p>
+          <div className="mb-2">
+            <p className="font-medium text-gray-700">Items:</p>
+            <ul className="list-disc list-inside text-sm text-gray-600">
+              {order.items.map((item, index) => (
+                <li key={index}>
+                  {item.name} x{item.quantity}
+                </li>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </ul>
+          </div>
+          <Select
+            value={order.status}
+            onValueChange={(value) =>
+              handleStatusChange(order.id!, value as OrderData['status'])
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Cambiar estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pendiente</SelectItem>
+              <SelectItem value="preparing">Preparando</SelectItem>
+              <SelectItem value="on-way">En Camino</SelectItem>
+              <SelectItem value="delivered">Entregado</SelectItem>
+              <SelectItem value="cancelled">Cancelado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card>
+
     </div>
   );
 };

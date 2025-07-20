@@ -1,29 +1,30 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { 
+import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarFooter
+  SidebarFooter,
 } from '@/components/ui/sidebar';
-import { 
-  Package, 
-  Receipt, 
-  MessageSquare, 
+import {
+  Package,
+  Receipt,
+  MessageSquare,
   Settings,
   LogOut,
-  User
+  User,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const menuItems = [
@@ -33,7 +34,12 @@ const menuItems = [
   { id: 'settings', label: 'Configuración', icon: Settings },
 ];
 
-export const AdminSidebar = ({ activeSection, setActiveSection }: AdminSidebarProps) => {
+export const AdminSidebar = ({
+  activeSection,
+  setActiveSection,
+  isOpen = true,
+  onClose,
+}: AdminSidebarProps) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -42,50 +48,83 @@ export const AdminSidebar = ({ activeSection, setActiveSection }: AdminSidebarPr
     navigate('/');
   };
 
+  const sidebarClasses = `
+    fixed z-40 inset-y-0 left-0 transform bg-white shadow-lg transition-transform duration-300 ease-in-out
+    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+    md:translate-x-0 md:relative md:z-auto md:shadow-none
+    w-20 md:w-64
+  `;
+
   return (
-    <Sidebar className="border-r border-gray-200 bg-white">
-      <SidebarHeader className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-            <User className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">Admin Panel</h2>
-            <p className="text-sm text-gray-500">{user?.name}</p>
-          </div>
-        </div>
-      </SidebarHeader>
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 z-30 md:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      <SidebarContent className="p-4">
-        <SidebarMenu className="space-y-2">
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.id}>
-              <SidebarMenuButton
-                onClick={() => setActiveSection(item.id)}
-                className={`w-full justify-start gap-3 px-3 py-2 rounded-lg transition-colors ${
-                  activeSection === item.id
-                    ? 'bg-blue-100 text-blue-700 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                }`}
+      <aside className={sidebarClasses}>
+        <Sidebar className="h-full flex flex-col border-r border-gray-200 bg-white">
+          <SidebarHeader className="p-4 md:p-6 border-b border-gray-200 flex items-center justify-center md:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <User className="h-5 w-5 text-white" />
+              </div>
+              {/* Solo mostrar el texto del panel en desktop */}
+              <div className="hidden md:block">
+                <h2 className="text-lg font-semibold text-gray-900">Admin Panel</h2>
+                <p className="text-sm text-gray-500">{user?.name}</p>
+              </div>
+            </div>
+
+            {/* BOTÓN CERRAR: oculto en móvil para que no aparezca */}
+            {/* {onClose && (
+              <button
+                onClick={onClose}
+                className="hidden md:inline text-gray-500 hover:text-gray-800"
               >
-                <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
+                ✕
+              </button>
+            )} */}
+          </SidebarHeader>
 
-      <SidebarFooter className="p-4 border-t border-gray-200">
-        <Button
-          variant="ghost"
-          onClick={handleLogout}
-          className="w-full justify-start gap-3 text-gray-600 hover:text-gray-900"
-        >
-          <LogOut className="h-5 w-5" />
-          Cerrar Sesión
-        </Button>
-      </SidebarFooter>
-    </Sidebar>
+          <SidebarContent className="p-2 md:p-4 flex-1 overflow-y-auto">
+            <SidebarMenu className="space-y-2">
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    onClick={() => {
+                      setActiveSection(item.id);
+                      if (onClose) onClose(); // cerrar sidebar en mobile
+                    }}
+                    className={`w-full justify-center md:justify-start gap-0 md:gap-3 px-2 py-2 rounded-lg transition-colors
+                      ${activeSection === item.id
+                        ? 'bg-blue-100 text-blue-700 font-medium'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}
+                    `}
+                  >
+                    <item.icon className="h-6 w-6" />
+                    {/* Mostrar texto solo en desktop */}
+                    <span className="hidden md:inline">{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+
+          <SidebarFooter className="p-4 border-t border-gray-200 flex justify-center md:justify-start">
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="w-full justify-center md:justify-start gap-0 md:gap-3 text-gray-600 hover:text-gray-900"
+            >
+              <LogOut className="h-6 w-6" />
+              <span className="hidden md:inline">Cerrar Sesión</span>
+            </Button>
+          </SidebarFooter>
+        </Sidebar>
+      </aside>
+    </>
   );
 };
