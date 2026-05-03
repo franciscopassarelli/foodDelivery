@@ -8,7 +8,6 @@ import {
   User,
   ShoppingCart,
   Bell,
-  Search,
   Menu,
   Package,
   MessageSquare
@@ -27,9 +26,9 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [showDropdown, setShowDropdown] = React.useState(false);
-  const [showProfileDropdown, setShowProfileDropdown] = React.useState(false);
+  const [activeDropdown, setActiveDropdown] = React.useState<null | 'notifications' | 'profile'>(null);
   const [notifications, setNotifications] = React.useState<any[]>([]);
+  const isCustomer = user?.role === 'customer';
 
   const getOrderStatusText = (status: string) => {
     switch (status) {
@@ -52,9 +51,10 @@ const Navbar = () => {
     logout();
     navigate('/');
     setIsMenuOpen(false);
-    setShowProfileDropdown(false);
+    setActiveDropdown(null);
   };
 
+  
   const isActive = (path: string) => location.pathname === path;
 
   React.useEffect(() => {
@@ -126,41 +126,45 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/menu"
-              className={`btn-sm ${isActive('/menu') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
-            >
-              Menú
-            </Link>
+        <div className="hidden md:flex items-center space-x-6">
+  {/* SOLO CUSTOMER ve menú */}
+  {isCustomer && (
+    <Link
+      to="/menu"
+      className={`btn-sm ${isActive('/menu') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
+    >
+      Menú
+    </Link>
+  )}
 
-            {isAuthenticated && (
-              <>
-                <Link
-                  to="/orders"
-                  className={`btn-sm flex items-center gap-1 ${isActive('/orders') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
-                >
-                  <Package size={16} />
-                  Pedidos
-                </Link>
-                <Link
-                  to="/support"
-                  className={`btn-sm flex items-center gap-1 ${isActive('/support') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
-                >
-                  <MessageSquare size={16} />
-                  Soporte
-                </Link>
-              </>
-            )}
-          </div>
+  {isAuthenticated && (
+    <>
+      {/* SOLO CUSTOMER ve pedidos */}
+      {isCustomer && (
+        <Link
+          to="/orders"
+          className={`btn-sm flex items-center gap-1 ${isActive('/orders') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
+        >
+          <Package size={16} />
+          Pedidos
+        </Link>
+      )}
+
+      {/* ESTE sí lo podés dejar para todos */}
+      <Link
+        to="/support"
+        className={`btn-sm flex items-center gap-1 ${isActive('/support') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
+      >
+        <MessageSquare size={16} />
+        Soporte
+      </Link>
+    </>
+  )}
+</div>
 
           {/* Right Buttons */}
           <div className="flex items-center space-x-4 relative">
-            <Button variant="ghost" size="sm" className="p-2 hidden md:inline-flex">
-              <Search size={18} />
-            </Button>
-
+            
             {/* Notificaciones */}
             {isAuthenticated && (
               <div className="relative hidden md:inline-flex">
@@ -168,7 +172,7 @@ const Navbar = () => {
                   variant="ghost"
                   size="sm"
                   className="p-2 relative"
-                  onClick={() => setShowDropdown(!showDropdown)}
+                  onClick={() => setActiveDropdown(activeDropdown === 'notifications' ? null : 'notifications')}
                 >
                   <Bell size={18} />
                   {notifications.length > 0 && (
@@ -178,7 +182,7 @@ const Navbar = () => {
                   )}
                 </Button>
 
-                {showDropdown && (
+                {activeDropdown === 'notifications' && (
                   <div className="absolute right-0 top-10 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-md z-50">
                     <div className="p-3">
                       <h4 className="font-semibold text-sm mb-2">Mensajes recientes</h4>
@@ -210,7 +214,7 @@ const Navbar = () => {
                       )}
                       <Link
                         to="/support"
-                        onClick={() => setShowDropdown(false)}
+                        onClick={() => setActiveDropdown(null)}
                         className="mt-3 block text-orange-600 hover:underline text-sm"
                       >
                         Ir a soporte
@@ -222,16 +226,27 @@ const Navbar = () => {
             )}
 
             {/* Carrito */}
-            <Link to="/cart" className="hidden md:inline-flex">
-              <Button variant="ghost" size="sm" className="p-2 relative">
-                <ShoppingCart size={18} />
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
+            {isCustomer && (
+  <Link to="/cart" className="hidden md:inline-flex">
+    <Button variant="ghost" size="sm" className="p-2 relative">
+      <ShoppingCart size={18} />
+      {totalItems > 0 && (
+        <Badge className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1">
+          {totalItems}
+        </Badge>
+      )}
+    </Button>
+  </Link>
+)}
+
+{user?.role === 'delivery' && (
+  <Link
+    to="/delivery"
+    className={`btn-sm ${isActive('/delivery') ? 'btn-primary' : 'text-gray-700 hover:text-orange-500'}`}
+  >
+    🛵 Delivery
+  </Link>
+)}
 
             {/* Perfil */}
             <div className="relative hidden md:inline-flex">
@@ -239,23 +254,23 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 className="p-2"
-                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                onClick={() => setActiveDropdown(activeDropdown === 'profile' ? null : 'profile')}
               >
                 <User size={18} />
               </Button>
 
-              {showProfileDropdown && (
+              {activeDropdown === 'profile' && (
                 <div className="absolute right-0 top-10 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50">
                   <div className="p-3 space-y-2 text-sm">
                     {isAuthenticated ? (
                       <>
-                        <Link to="/profile" onClick={() => setShowProfileDropdown(false)} className="block hover:text-orange-500">Mi perfil</Link>
+                        <Link to="/profile" onClick={() => setActiveDropdown(null)} className="block hover:text-orange-500">Mi perfil</Link>
                         <button onClick={handleLogout} className="block w-full text-left hover:text-red-500">Salir</button>
                       </>
                     ) : (
                       <>
-                        <Link to="/login" onClick={() => setShowProfileDropdown(false)} className="block hover:text-orange-500">Ingresar</Link>
-                        <Link to="/register" onClick={() => setShowProfileDropdown(false)} className="block hover:text-orange-500">Registrarse</Link>
+                        <Link to="/login" onClick={() => setActiveDropdown(null)} className="block hover:text-orange-500">Ingresar</Link>
+                        <Link to="/register" onClick={() => setActiveDropdown(null)} className="block hover:text-orange-500">Registrarse</Link>
                       </>
                     )}
                   </div>
@@ -277,31 +292,93 @@ const Navbar = () => {
         </div>
 
         {/* Menú mobile */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-2 space-y-2 border-t border-orange-200 pt-4 pb-4">
-            <Link to="/menu" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>Menú</Link>
-            <Link to="/cart" className="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>
-              <span>Carrito</span>
-              {totalItems > 0 && (
-                <Badge className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">{totalItems}</Badge>
-              )}
-            </Link>
+       {/* Menú mobile */}
+{isMenuOpen && (
+  <div className="md:hidden mt-2 space-y-2 border-t border-orange-200 pt-4 pb-4">
+    
+    {/* SOLO CUSTOMER */}
+    {isCustomer && (
+      <Link
+        to="/menu"
+        className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        Menú
+      </Link>
+    )}
 
-            {isAuthenticated ? (
-              <>
-                <Link to="/orders" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>Pedidos</Link>
-                <Link to="/support" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>Soporte</Link>
-                <Link to="/profile" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>Mi perfil</Link>
-                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg">Salir</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>Ingresar</Link>
-                <Link to="/register" className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg" onClick={() => setIsMenuOpen(false)}>Registrarse</Link>
-              </>
-            )}
-          </div>
+    {isCustomer && (
+      <Link
+        to="/cart"
+        className="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <span>Carrito</span>
+        {totalItems > 0 && (
+          <Badge className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">
+            {totalItems}
+          </Badge>
         )}
+      </Link>
+    )}
+
+    {isAuthenticated ? (
+      <>
+        {/* SOLO CUSTOMER */}
+        {isCustomer && (
+          <Link
+            to="/orders"
+            className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Pedidos
+          </Link>
+        )}
+
+        {/* TODOS */}
+        <Link
+          to="/support"
+          className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Soporte
+        </Link>
+
+        <Link
+          to="/profile"
+          className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Mi perfil
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+        >
+          Salir
+        </button>
+      </>
+    ) : (
+      <>
+        <Link
+          to="/login"
+          className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Ingresar
+        </Link>
+        <Link
+          to="/register"
+          className="block px-4 py-2 text-gray-700 hover:bg-orange-50 rounded-lg"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Registrarse
+        </Link>
+      </>
+    )}
+  </div>
+)}
       </div>
     </nav>
   );

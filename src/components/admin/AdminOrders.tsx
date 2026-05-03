@@ -43,11 +43,25 @@ const statusColors = {
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<OrderData[]>([]);
+  const [filter, setFilter] = useState<'all' | 'pending' | 'preparing' | 'on-way' | 'delivered' | 'cancelled'>('all');
+
 
   useEffect(() => {
     const unsubscribe = listenOrders(setOrders);
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (filter === 'all') {
+      listenOrders(setOrders);
+    } else {
+      const unsubscribe = listenOrders((orders) => {
+        setOrders(orders.filter(order => order.status === filter));
+      });
+      return () => unsubscribe();
+    }
+  }, [filter]);
+
 
   const handleStatusChange = async (orderId: string, newStatus: OrderData['status']) => {
     try {
@@ -70,6 +84,22 @@ export const AdminOrders = () => {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Pedidos</h1>
         <p className="text-gray-600">Administra y actualiza el estado de los pedidos</p>
+      </div>
+
+      <div>
+        <Select value={filter} onValueChange={(value) => setFilter(value as any)}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Filtrar por estado" />  
+          </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Todos</SelectItem>
+          <SelectItem value="pending">Pendientes</SelectItem>
+          <SelectItem value="preparing">Preparando</SelectItem>
+          <SelectItem value="on-way">En Camino</SelectItem>
+          <SelectItem value="delivered">Entregados</SelectItem>
+          <SelectItem value="cancelled">Cancelados</SelectItem>
+        </SelectContent>
+      </Select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

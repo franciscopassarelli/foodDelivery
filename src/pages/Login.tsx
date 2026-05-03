@@ -99,6 +99,50 @@ const Login = () => {
               ← Volver al inicio
             </Link>
           </div>
+
+          <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+  <p className="text-sm font-semibold text-gray-700 mb-3">
+    🧪 Usuarios de prueba
+  </p>
+
+  <div className="space-y-2 text-sm">
+    
+    <button
+      onClick={() => {
+        setEmail('cliente@demo.com');
+        setPassword('123456');
+      }}
+      className="w-full text-left p-2 rounded hover:bg-gray-100 transition"
+    >
+      👤 <span className="font-medium">Cliente</span>
+    </button>
+
+    <button
+      onClick={() => {
+        setEmail('chicodelivery@demo.com');
+        setPassword('Delivery');
+      }}
+      className="w-full text-left p-2 rounded hover:bg-gray-100 transition"
+    >
+      🛵 <span className="font-medium">Repartidor</span>
+    </button>
+
+    <button
+      onClick={() => {
+        setEmail('admin@demo.com');
+        setPassword('administrador');
+      }}
+      className="w-full text-left p-2 rounded hover:bg-gray-100 transition"
+    >
+      🛠️ <span className="font-medium">Administrador</span>
+    </button>
+
+  </div>
+
+  <p className="text-xs text-gray-500 mt-3">
+    También puedes registrarte con tu propia cuenta.
+  </p>
+</div>
         </CardContent>
       </Card>
     </div>

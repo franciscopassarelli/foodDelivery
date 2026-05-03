@@ -77,28 +77,30 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    const savedUser = localStorage.getItem('foodDeliveryUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const storedUser = localStorage.getItem('foodDeliveryUser');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
- const saveUser = (userData: User) => {
-  console.log("💾 Guardando en localStorage y Firestore:", userData);
+const saveUser = (userData: User, persist = false) => {
   setUser(userData);
   localStorage.setItem('foodDeliveryUser', JSON.stringify(userData));
-  updateUserProfile(userData.id, userData);
+
+  if (persist) {
+    updateUserProfile(userData.id, userData);
+  }
 };
 
-
-  const updateUser = (newData: Partial<User>) => {
+const updateUser = (newData: Partial<User>) => {
   if (!user) return;
 
-  const updatedUser = { ...user, ...newData };
-  console.log("🔄 Actualizando usuario en contexto:", updatedUser);
+  const { role, ...safeData } = newData; // ❌ eliminás role
+
+  const updatedUser = { ...user, ...safeData };
+
   saveUser(updatedUser);
 };
 
@@ -161,10 +163,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    signOut(auth);
-    setUser(null);
-    localStorage.removeItem('foodDeliveryUser');
-  };
+  signOut(auth);
+  setUser(null);
+
+  localStorage.removeItem('foodDeliveryUser');
+  localStorage.removeItem(`foodDeliveryCart_${user?.id}`);
+};
 
   // DIRECCIONES
   const addAddress = (newAddress: Omit<Address, 'id'>) => {
